@@ -10,6 +10,7 @@ Policy Routing
 - [Hardware](#hardware)
 - [Implementation](#implementation)
   - [Step 01 - Create the virtual machine](#step-01---create-the-virtual-machine)
+  - [Step 02 - Create the required namespaces](#)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
