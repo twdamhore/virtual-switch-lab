@@ -13,7 +13,7 @@ Policy Routing
 
 ## Overview
 The lab uses multipass to create a virtual machine.
-There will be 7 network namespaces that will be from various PC at home and a layer as mock internet.
+There will be 6 network namespaces that will be from various PC at home and a layer as mock internet.
 The objective is to contrast not using policy routing vs using policy routing.
 The PC at home will ping internet using the default route.
 Then policy routing will be added.
@@ -90,15 +90,9 @@ Create 1 namespace for the router.
 ubuntu@lab1:~$ sudo ip netns add ns-router
 ```
 
-Create 1 namespace for the mock internet.
-```
-ubuntu@lab1:~$ sudo ip netns add ns-net
-```
-
 Verify all namespaces are present
 ```
 ubuntu@lab1:~$ ip netns show
-ns-net
 ns-isp-2
 ns-isp-1
 ns-router
