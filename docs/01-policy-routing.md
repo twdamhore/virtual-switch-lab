@@ -28,7 +28,7 @@ The PC at home will ping internet again to show that policy routing has been imp
 ### Diagram
 ```mermaid
 graph TD
-    Internet["Internet<br>ns-net<br>- 8.8.8.8"]
+    Internet("Internet")
     
     ISP1["ISP-1<br>ns-isp-1<br>- 10.0.1.1/30"]
     ISP2["ISP-2<br>ns-isp-2<br>- 10.0.2.1/30"]
