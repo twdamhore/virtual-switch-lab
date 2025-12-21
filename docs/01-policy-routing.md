@@ -61,15 +61,49 @@ This was tested on a `Beelink Mini S` with `Intel(R) N100` with `16 GB DDR4`.
 ## Implementation
 ## Step 01 - Create the virtual machine
 Command:
-```
+```bash
 multipass launch --name lab1
 ```
 This will create a new virtual machine with `1 GB` RAM and 1 thread.
 
 Run the `shell` command to access the virtual machine.
-```
+```bash
 multipass shell lab1
 ```
+## Step 02 - Create the required namespaces
+Verify that there are no existing network namespaces.
 
+```code
+ubuntu@lab1:~$ ip link show type netns
+```
+This list will be empty.
 
+Create 3 namespace for the 3 PC devices.
+```
+ubuntu@lab1:~$ sudo ip netns add ns-pc-1
+ubuntu@lab1:~$ sudo ip netns add ns-pc-2
+ubuntu@lab1:~$ sudo ip netns add ns-pc-3
+```
+
+Create 1 namespace for the router.
+```
+ubuntu@lab1:~$ sudo ip netns add ns-router
+```
+
+Create 1 namespace for the mock internet.
+```
+ubuntu@lab1:~$ sudo ip netns add ns-net
+```
+
+Verify all namespaces are present
+```
+ubuntu@lab1:~$ ip netns show
+ns-net
+ns-isp-2
+ns-isp-1
+ns-router
+ns-pc-3
+ns-pc-2
+ns-pc-1
+```
 
