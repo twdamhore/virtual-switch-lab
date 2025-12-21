@@ -6,7 +6,13 @@ Policy Routing
 - [Requirements](#requirements)
 
 ## Overview
-The lab uses multipass to create a virtual machine. There will be 7 network namespaces that will be from various pc at home and a layer as mock internet. The objective is to contrast not using policy routing vs using policy routing.
+The lab uses multipass to create a virtual machine.
+There will be 7 network namespaces that will be from various PC at home and a layer as mock internet.
+The objective is to contrast not using policy routing vs using policy routing.
+The PC at home will ping internet using the default route.
+Then policy routing will be added.
+The PC at home will ping internet again to show that policy routing has been implemented.
+
 
 ## Requirements
 - [Multipass](https://canonical.com/multipass) installation.
