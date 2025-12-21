@@ -8,6 +8,7 @@ Policy Routing
   - [Diagram](#diagram)
   - [Network Namespace](#network-namespace)
 - [Hardware](#hardware)
+- Implementation
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -55,5 +56,19 @@ graph TD
 
 ## Hardware
 This was tested on a `Beelink Mini S` with `Intel(R) N100` with `16 GB DDR4`.
+
+## Implementation
+## Step 01 - Create the virtual machine
+Command:
+```
+multipass launch --name lab1
+```
+This will create a new virtual machine with `1 GB` RAM and 1 thread.
+
+Run the `shell` command to access the virtual machine.
+```
+multipass shell lab1
+```
+
 
 
