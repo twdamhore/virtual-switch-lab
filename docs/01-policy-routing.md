@@ -7,6 +7,7 @@ Policy Routing
 - [Layout](#layout)
   - [Diagram](#diagram)
   - [Network Namespace](#network-namespace)
+- [Hardware](#hardware)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -52,5 +53,7 @@ graph TD
 - ns-router - The router connects 3 networks together (LAN, ISP-1, ISP-2). The default route and policy routing will be configured on this interface.
 - ns-pc-1, ns-pc-2 and ns-pc-3 - This will represent devices connected to `ns-router`.
 
+## Hardware
+This was tested on a `Beelink Mini S` with `Intel(R) N100` with `16 GB DDR4`.
 
 
