@@ -4,6 +4,8 @@ Policy Routing
 ## Table of Contents
 - [Overview](#overview)
 - [Requirements](#requirements)
+- [Layout](#layout)
+  - [Diagram](#diagram)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
