@@ -8,7 +8,8 @@ Policy Routing
   - [Diagram](#diagram)
   - [Network Namespace](#network-namespace)
 - [Hardware](#hardware)
-- Implementation
+- [Implementation](x)
+  - Step 01 - x
 
 ## Overview
 The lab uses multipass to create a virtual machine.
