@@ -53,7 +53,6 @@ graph TD
     Bridge <---> PC3
 ```
 ### Network Namespace
-- ns-net - This is mock Internet tha will be the final destination for PC-1, PC-2 and PC-3.
 - ns-isp-1 and ns-isp-2 - The namespace `ns-isp-1` will be the default gateway for PC-1, PC-2 and PC-3. We will then introduce policy routing where PC-1 will be explicitly configured to use `ns-isp-1`, PC-2 will be explicitly configured to use `ns-isp-2` and PC-3 will use `ns-isp-1` implicitly as PC-3 was not explcitly configure with any policy routing and will use the default route.
 - ns-router - The router connects 3 networks together (LAN, ISP-1, ISP-2). The default route and policy routing will be configured on this interface.
 - ns-pc-1, ns-pc-2 and ns-pc-3 - This will represent devices connected to `ns-router`.
