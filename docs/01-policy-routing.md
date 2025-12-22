@@ -13,7 +13,7 @@ Policy Routing
   - [Step 02 - Create the required namespaces](#step-02---create-the-required-namespaces)
   - [Step 03 - Assign an IP address to ns-pc-1](#step-03---assign-an-ip-address-to-ns-pc-1)
   - [Step 04 - Assign an IP address to ns-router](#step-04---assign-an-ip-address-to-ns-router)
-  - [Step 05 - Assign an IP address to ns-isp-1](#step-04---assign-an-ip-address-to-ns-isp-1)
+  - [Step 05 - Assign an IP address to ns-isp-1](#step-05---assign-an-ip-address-to-ns-isp-1)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -288,3 +288,34 @@ ubuntu@lab1:~$
 - The bridge `br-lan` in the namespace `ns-router` with the IP `192.168.1.1` can ping the IP `192.168.1.101`.
 - The link `veth-pc-1-pc` that was `LOWERLAYERDOWN` is now `UP`.
 ### Step 05 - Assign an IP address to ns-isp-1
+```
+ubuntu@lab1:~$ ip link show type veth
+ubuntu@lab1:~$ sudo ip link add veth-isp-1-in type veth peer name veth-isp-1-rt
+ubuntu@lab1:~$ ip link show type veth
+5: veth-isp-1-rt@veth-isp-1-in: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 02:e4:01:18:f1:c6 brd ff:ff:ff:ff:ff:ff
+6: veth-isp-1-in@veth-isp-1-rt: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 6e:ae:b3:8c:c8:d7 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-1 ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type veth
+3: veth-pc-1-rt@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-lan state UP mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
+ubuntu@lab1:~$ sudo ip link set veth-isp-1-in netns ns-isp-1
+ubuntu@lab1:~$ sudo ip link set veth-isp-1-rt netns ns-router
+ubuntu@lab1:~$ ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-1 ip link show type veth
+6: veth-isp-1-in@if5: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 6e:ae:b3:8c:c8:d7 brd ff:ff:ff:ff:ff:ff link-netns ns-router
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type veth
+3: veth-pc-1-rt@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-lan state UP mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
+5: veth-isp-1-rt@if6: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 02:e4:01:18:f1:c6 brd ff:ff:ff:ff:ff:ff link-netns ns-isp-1
+```
+- Create the cable with `veth-isp-1-in` on one end and `veth-isp-1-rt` on the other end.
+- Associate `veth-isp-1-in` with `ns-isp-1`.
+- Associate `veth-isp-1-rt` with `ns-router`.
+
+---
+
+
