@@ -11,7 +11,8 @@ Policy Routing
 - [Implementation](#implementation)
   - [Step 01 - Create the virtual machine](#step-01---create-the-virtual-machine)
   - [Step 02 - Create the required namespaces](#step-02---create-the-required-namespaces)
-  - [Step 03 - Assign an IP address to ns-pc-1](step-03---assign-an-ip-address-to-ns-pc-1)
+  - [Step 03 - Assign an IP address to ns-pc-1](#step-03---assign-an-ip-address-to-ns-pc-1)
+  - [Step 04 - Assign an IP address to ns-router](#step-04---assign-an-ip-address-to-ns-router)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -217,3 +218,70 @@ ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link show veth-pc-1-pc
     link/ether 56:c6:06:80:c2:2f brd ff:ff:ff:ff:ff:ff link-netns ns-router
 ```
 We have a static IP configured for `ns-pc-1`.
+
+### Step 04 - Assign an IP address to ns-router
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-router ping -c 5 -W 1 192.168.1.1
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip -br -4 address show
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show veth-pc-1-rt
+3: veth-pc-1-rt@if4: <BROADCAST,MULTICAST> mtu 1500 qdisc noop master br-lan state DOWN mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show br-lan
+2: br-lan: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip addr add 192.168.1.1/24 dev br-lan
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-pc-1-rt up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set br-lan up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set lo up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ping -c 5 -W 1 192.168.1.1
+PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
+64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.019 ms
+64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.079 ms
+64 bytes from 192.168.1.1: icmp_seq=3 ttl=64 time=0.077 ms
+64 bytes from 192.168.1.1: icmp_seq=4 ttl=64 time=0.077 ms
+64 bytes from 192.168.1.1: icmp_seq=5 ttl=64 time=0.075 ms
+
+--- 192.168.1.1 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4121ms
+rtt min/avg/max/mdev = 0.019/0.065/0.079/0.023 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip -br -4 address show
+lo               UNKNOWN        127.0.0.1/8 
+br-lan           UP             192.168.1.1/24 
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show veth-pc-1-rt
+3: veth-pc-1-rt@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-lan state UP mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show br-lan
+2: br-lan: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ sudo ip netns exec ns-router ping -c 5 -W 1 192.168.1.101
+PING 192.168.1.101 (192.168.1.101) 56(84) bytes of data.
+64 bytes from 192.168.1.101: icmp_seq=1 ttl=64 time=0.052 ms
+64 bytes from 192.168.1.101: icmp_seq=2 ttl=64 time=0.094 ms
+64 bytes from 192.168.1.101: icmp_seq=3 ttl=64 time=0.092 ms
+64 bytes from 192.168.1.101: icmp_seq=4 ttl=64 time=0.093 ms
+64 bytes from 192.168.1.101: icmp_seq=5 ttl=64 time=0.094 ms
+
+--- 192.168.1.101 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4075ms
+rtt min/avg/max/mdev = 0.052/0.085/0.094/0.016 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 5 -W 1 192.168.1.1
+PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
+64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.024 ms
+64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.098 ms
+64 bytes from 192.168.1.1: icmp_seq=3 ttl=64 time=0.095 ms
+64 bytes from 192.168.1.1: icmp_seq=4 ttl=64 time=0.095 ms
+64 bytes from 192.168.1.1: icmp_seq=5 ttl=64 time=0.096 ms
+
+--- 192.168.1.1 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4091ms
+rtt min/avg/max/mdev = 0.024/0.081/0.098/0.028 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip -br -4 address show
+lo               UNKNOWN        127.0.0.1/8 
+veth-pc-1-pc@if3 UP             192.168.1.101/24 
+ubuntu@lab1:~$ 
+
+```
+- The bridge `br-lan` in the namespace `ns-router` with the IP `192.168.1.1` can ping the IP `192.168.1.101`.
+- The link `veth-pc-1-pc` that was `LOWERLAYERDOWN` is now `UP`.
+  
