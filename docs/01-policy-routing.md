@@ -11,7 +11,7 @@ Policy Routing
 - [Implementation](#implementation)
   - [Step 01 - Create the virtual machine](#step-01---create-the-virtual-machine)
   - [Step 02 - Create the required namespaces](#step-02---create-the-required-namespaces)
-  - 
+  - [Step 03 - Assign an IP address to ns-pc-1](step-03---assign-an-ip-address-to-ns-pc-1)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -152,3 +152,68 @@ ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type veth
 ubuntu@lab1:~$ ip link show type veth
 ```
 The link `veth-pc-1-pc` is in now in `ns-pc-1` and the link `veth-pc-1-rt` is in `ns-router`.
+
+---
+Add a bridge.
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type bridge
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link add br-lan type bridge
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type bridge
+2: br-lan: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 7e:5e:38:cf:cb:b6 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ 
+```
+The bridge is in the namespace but the bridge is still down.
+
+---
+Plug in the cable in the namespace to the bridge:
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show veth-pc-1-rt
+3: veth-pc-1-rt@if4: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show br-lan
+2: br-lan: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 7e:5e:38:cf:cb:b6 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-pc-1-rt master br-lan
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show veth-pc-1-rt
+3: veth-pc-1-rt@if4: <BROADCAST,MULTICAST> mtu 1500 qdisc noop master br-lan state DOWN mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show br-lan
+2: br-lan: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 5e:c2:a2:af:31:19 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ 
+```
+We can see that `veth-pc-1-rt` has `master br-lan`.
+
+---
+
+Configure the IP address for `ns-pc-1`:
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 5 -W 1 192.168.1.101
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip -br -4 address show
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link show veth-pc-1-pc
+4: veth-pc-1-pc@if3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 56:c6:06:80:c2:2f brd ff:ff:ff:ff:ff:ff link-netns ns-router
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip addr add 192.168.1.101/24 dev veth-pc-1-pc
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link set veth-pc-1-pc up
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link set lo up
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 5 -W 1 192.168.1.101
+PING 192.168.1.101 (192.168.1.101) 56(84) bytes of data.
+64 bytes from 192.168.1.101: icmp_seq=1 ttl=64 time=0.018 ms
+64 bytes from 192.168.1.101: icmp_seq=2 ttl=64 time=0.073 ms
+64 bytes from 192.168.1.101: icmp_seq=3 ttl=64 time=0.072 ms
+64 bytes from 192.168.1.101: icmp_seq=4 ttl=64 time=0.074 ms
+64 bytes from 192.168.1.101: icmp_seq=5 ttl=64 time=0.072 ms
+
+--- 192.168.1.101 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4105ms
+rtt min/avg/max/mdev = 0.018/0.061/0.074/0.021 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip -br -4 address show
+lo               UNKNOWN        127.0.0.1/8 
+veth-pc-1-pc@if3 LOWERLAYERDOWN 192.168.1.101/24 
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link show veth-pc-1-pc
+4: veth-pc-1-pc@if3: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state LOWERLAYERDOWN mode DEFAULT group default qlen 1000
+    link/ether 56:c6:06:80:c2:2f brd ff:ff:ff:ff:ff:ff link-netns ns-router
+```
+We have a static IP configured for `ns-pc-1`.
