@@ -39,22 +39,32 @@ graph TD
     
     ISP1["ISP-1<br>ns-isp-1<br>- 10.0.1.1/30"]
     ISP2["ISP-2<br>ns-isp-2<br>- 10.0.2.1/30"]
-    
-    Bridge["Router<br>ns-router<br>- 192.168.1.1/24<br>- 10.0.1.2/30<br>- 10.0.2.2/30"]
+
+    subgraph NS_ROUTER["ns-router"]
+        ROUTER["Router<br>ns-router<br>- 192.168.1.1/24<br>- 10.0.1.2/30<br>- 10.0.2.2/30"]
+        BR_LAN("Switch<br>br-lan")
+    end
     
     subgraph LAN
-        PC1["PC-1<br>ns-pc-1<br>- 192.168.1.101/24"]
-        PC2["PC-2<br>ns-pc-2<br>- 192.168.1.102/24"]
-        PC3["PC-3<br>ns-pc-3<br>- 192.168.1.103/24"]
+        subgraph NS_PC_1["ns-pc-1"]
+            PC_1_IN["veth-pc-1-in<br>- 192.168.1.101/24"]
+        end
+        subgraph NS_PC_2["ns-pc-2"]
+            PC_2_IN["veth-pc-2-in<br>- 192.168.1.102/24"]
+        end
+        subgraph NS_PC_3["ns-pc-3"]
+            PC_3_IN["veth-pc-3-in<br>- 192.168.1.103/24"]
+        end
     end
     
     Internet <---> ISP1
     Internet <---> ISP2
-    ISP1 <---> Bridge
-    ISP2 <---> Bridge
-    Bridge <---> PC1
-    Bridge <---> PC2
-    Bridge <---> PC3
+    ISP1 <---> ROUTER
+    ISP2 <---> ROUTER
+    BR_LAN <---> ROUTER
+    BR_LAN <---> PC_1_IN
+    BR_LAN <---> PC_2_IN
+    BR_LAN <---> PC_3_IN
 ```
 ### Network Namespace
 - ns-isp-1 and ns-isp-2 - The namespace `ns-isp-1` will be the default gateway for PC-1, PC-2 and PC-3. We will then introduce policy routing where PC-1 will be explicitly configured to use `ns-isp-1`, PC-2 will be explicitly configured to use `ns-isp-2` and PC-3 will use `ns-isp-1` implicitly as PC-3 was not explcitly configure with any policy routing and will use the default route.
@@ -286,7 +296,7 @@ ubuntu@lab1:~$
 
 ```
 - The bridge `br-lan` in the namespace `ns-router` with the IP `192.168.1.1` can ping the IP `192.168.1.101`.
-- The link `veth-pc-1-pc` that was `LOWERLAYERDOWN` is now `UP`.
+- The link `veth-pc-1-in` that was `LOWERLAYERDOWN` is now `UP`.
 ### Step 05 - Assign an IP address to ns-isp-1
 ```
 ubuntu@lab1:~$ ip link show type veth
