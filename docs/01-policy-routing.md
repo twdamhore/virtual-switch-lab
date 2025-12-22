@@ -13,6 +13,7 @@ Policy Routing
   - [Step 02 - Create the required namespaces](#step-02---create-the-required-namespaces)
   - [Step 03 - Assign an IP address to ns-pc-1](#step-03---assign-an-ip-address-to-ns-pc-1)
   - [Step 04 - Assign an IP address to ns-router](#step-04---assign-an-ip-address-to-ns-router)
+  - [Step 05 - Assign an IP address to ns-isp-1](#step-04---assign-an-ip-address-to-ns-isp-1)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -29,6 +30,9 @@ The PC at home will ping internet again to show that policy routing has been imp
 
 ## Layout
 ### Diagram
+```mermaid
+info
+```
 ```mermaid
 graph TD
     Internet("Internet")
@@ -283,4 +287,4 @@ ubuntu@lab1:~$
 ```
 - The bridge `br-lan` in the namespace `ns-router` with the IP `192.168.1.1` can ping the IP `192.168.1.101`.
 - The link `veth-pc-1-pc` that was `LOWERLAYERDOWN` is now `UP`.
-  
+### Step 05 - Assign an IP address to ns-isp-1
