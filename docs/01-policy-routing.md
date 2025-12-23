@@ -33,34 +33,26 @@ The PC at home will ping internet again to show that policy routing has been imp
 ```mermaid
 graph TB
     Internet@{ label: "Internet", shape: cloud }
-    subgraph ISP
-        ISP_1["ns-isp-1"]
-        ISP_2["ns-isp-2"]
-    end
+    ISP_1["ns-isp-1"]
+    ISP_2["ns-isp-2"]
     subgraph ROUTER
         ROUTER_PORT_1["router-port-1"]
         ROUTER_PORT_2["router-port-2"]
         ROUTER_PORT_3["router-port-3"]
     end
-    subgraph SWITCH
-        SWITCH_PORT_1["switch-port-1"]
-        SWITCH_PORT_2["switch-port-2"]
-        SWITCH_PORT_3["switch-port-3"]
-    end
-    subgraph PC
-        PC_1["pc-1"]
-        PC_2["pc-2"]
-        PC_3["pc-3"]
-    end
+    SWITCH
+    PC_1["pc-1"]
+    PC_2["pc-2"]
+    PC_3["pc-3"]
     
     Internet <--> ISP_1
     Internet <--> ISP_2
     ISP_1 <--> ROUTER_PORT_1
     ISP_2 <--> ROUTER_PORT_3
     ROUTER_PORT_2 <--> SWITCH
-    SWITCH_PORT_1 <--> PC_1
-    SWITCH_PORT_2 <--> PC_2
-    SWITCH_PORT_3 <--> PC_3
+    SWITCH <--> PC_1
+    SWITCH <--> PC_2
+    SWITCH <--> PC_3
     
 ```
 ### Network Namespace
