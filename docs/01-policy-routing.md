@@ -31,44 +31,37 @@ The PC at home will ping internet again to show that policy routing has been imp
 ## Layout
 ### Diagram
 ```mermaid
-graph LR
-    subgraph PCs
-        subgraph ns-pc-1
-            PC1["veth-pc1<br>192.168.1.101/24"]
-        end
-        subgraph ns-pc-2
-            PC2["veth-pc2<br>192.168.1.102/24"]
-        end
-        subgraph ns-pc-3
-            PC3["veth-pc3<br>192.168.1.103/24"]
-        end
-    end
-    
-    subgraph ns-router
-        BR_LAN["br-lan<br>(switch)<br>NO IP"]
-        RTR_LAN["veth-rtr-lan<br>192.168.1.1/24"]
-        RTR_ISP1["veth-rtr-isp1<br>10.0.1.2/30"]
-        RTR_ISP2["veth-rtr-isp2<br>10.0.2.2/30"]
-    end
-    
-    subgraph ns-isp-1
-        ISP1_RTR["veth-isp1-rtr<br>10.0.1.1/30"]
-    end
-    
-    subgraph ns-isp-2
-        ISP2_RTR["veth-isp2-rtr<br>10.0.2.1/30"]
-    end
-    
+graph TB
     Internet@{ label: "Internet", shape: cloud }
+    subgraph ISP
+        ISP_1["ns-isp-1"]
+        ISP_2["ns-isp-2"]
+    end
+    subgraph ROUTER
+        ROUTER_PORT_1["router-port-1"]
+        ROUTER_PORT_2["router-port-2"]
+        ROUTER_PORT_3["router-port-3"]
+    end
+    subgraph SWITCH
+        SWITCH_PORT_1["switch-port-1"]
+        SWITCH_PORT_2["switch-port-2"]
+        SWITCH_PORT_3["switch-port-3"]
+    end
+    subgraph PC
+        PC_1["pc-1"]
+        PC_2["pc-2"]
+        PC_3["pc-3"]
+    end
     
-    PC1 --- BR_LAN
-    PC2 --- BR_LAN
-    PC3 --- BR_LAN
-    BR_LAN --- RTR_LAN
-    RTR_ISP1 --- ISP1_RTR
-    RTR_ISP2 --- ISP2_RTR
-    ISP1_RTR --- Internet
-    ISP2_RTR --- Internet
+    Internet <--> ISP_1
+    Internet <--> ISP_2
+    ISP_1 <--> ROUTER_PORT_1
+    ISP_2 <--> ROUTER_PORT_3
+    ROUTER_PORT_2 <--> SWITCH
+    SWITCH_PORT_1 <--> PC_1
+    SWITCH_PORT_2 <--> PC_2
+    SWITCH_PORT_3 <--> PC_3
+    
 ```
 ### Network Namespace
 - ns-isp-1 and ns-isp-2 - The namespace `ns-isp-1` will be the default gateway for PC-1, PC-2 and PC-3. We will then introduce policy routing where PC-1 will be explicitly configured to use `ns-isp-1`, PC-2 will be explicitly configured to use `ns-isp-2` and PC-3 will use `ns-isp-1` implicitly as PC-3 was not explcitly configure with any policy routing and will use the default route.
