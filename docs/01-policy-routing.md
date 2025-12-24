@@ -13,6 +13,7 @@ Policy Routing
   - [Step 02 - Access the vm](#step-02---access-the-vm)
   - [Step 03 - Create the required namespaces](#step-03---create-the-required-namespaces)
   - [Step 04 - Create the required links](#step-04---create-the-required-links)
+  - 
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -47,14 +48,14 @@ graph TB
     PC_2["ns-pc-2<br>192.168.100.102/24"]
     PC_3["ns-pc-3<br>192.168.100.103/24"]
     
-    Internet <--> ISP_1
-    Internet <--> ISP_2
-    ISP_1 <--> ROUTER_PORT_1
-    ISP_2 <--> ROUTER_PORT_3
-    ROUTER_PORT_2 <--> SWITCH
-    SWITCH <--> PC_1
-    SWITCH <--> PC_2
-    SWITCH <--> PC_3
+    Internet <-- link-7 --> ISP_1
+    Internet <-- link-8 --> ISP_2
+    ISP_1 <-- link-5 --> ROUTER_PORT_1
+    ISP_2 <-- link-6 --> ROUTER_PORT_3
+    ROUTER_PORT_2 <-- link-4 --> SWITCH
+    SWITCH <-- link-1 --> PC_1
+    SWITCH <-- link-2 --> PC_2
+    SWITCH <-- link-3 --> PC_3
 ```
 ### Network Namespace
 - ns-internet - This will represent a common destination being accessed by different ISPs.
@@ -365,4 +366,30 @@ ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link show type veth
     link/ether c2:71:c4:78:0d:f0 brd ff:ff:ff:ff:ff:ff link-netns ns-isp-2
 ```
 ---
-Assign the links in the `ns-router` namespace
+### Step 04 - Assign IP addresses
+Command:
+```
+sudo ip netns exec ns-pc-1 ip -4 -br address
+sudo ip netns exec ns-pc-2 ip -4 -br address
+sudo ip netns exec ns-pc-3 ip -4 -br address
+sudo ip netns exec ns-router ip -4 -br address
+sudo ip netns exec ns-isp-1 ip -4 -br address
+sudo ip netns exec ns-isp-2 ip -4 -br address
+sudo ip netns exec ns-internet ip -4 -br address
+
+sudo ip netns exec ns-pc-1 ip add add 192.168.100.101/24 dev veth-1a
+sudo ip netns exec ns-pc-2 ip add add 192.168.100.102/24 dev veth-2a
+sudo ip netns exec ns-pc-3 ip add add 192.168.100.103/24 dev veth-3a
+
+```
+Sample output:
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip -4 -br address
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip -4 -br address
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ip -4 -br address
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip -4 -br address
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-1 ip -4 -br address
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-2 ip -4 -br address
+ubuntu@lab1:~$ sudo ip netns exec ns-internet ip -4 -br address
+```
+
