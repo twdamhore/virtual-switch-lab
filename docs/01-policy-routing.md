@@ -199,6 +199,7 @@ sudo ip link add veth-4a type veth peer name veth-4b
 sudo ip link add veth-5a type veth peer name veth-5b
 sudo ip link add veth-6a type veth peer name veth-6b
 sudo ip link add veth-7a type veth peer name veth-7b
+sudo ip link add veth-8a type veth peer name veth-8b
 ip link show type veth
 ```
 Sample output:
