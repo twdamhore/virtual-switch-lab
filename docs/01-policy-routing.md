@@ -83,10 +83,76 @@ $ echo  'package_update: true\npackage_upgrade: true\npackages:\n  - traceroute'
 Launched: lab1
 ```
 
-### Step 02 - Create the required namespaces
+### Step 02 - Access the vm
 Command:
 ```
+multipass shell lab1
 ```
 Sample output:
 ```
+$ multipass shell lab1
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-90-generic aarch64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Tue Dec 23 18:35:49 MST 2025
+
+  System load:             0.0
+  Usage of /:              52.3% of 3.80GB
+  Memory usage:            20%
+  Swap usage:              0%
+  Processes:               94
+  Users logged in:         0
+  IPv4 address for enp0s1: 192.168.2.8
+  IPv6 address for enp0s1: fde8:bf1d:8203:1850:5054:ff:fe92:d4cc
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+ubuntu@lab1:~$ 
 ```
+### Step 03 - Create the required namespaces
+```
+ip netns list
+sudo ip netns add ns-internet
+sudo ip netns add ns-isp-1
+sudo ip netns add ns-isp-2
+sudo ip netns add ns-router
+sudo ip netns add ns-pc-1
+sudo ip netns add ns-pc-2
+sudo ip netns add ns-pc-3
+ip netns list
+```
+Sample output:
+```
+ubuntu@lab1:~$ ip netns list
+ubuntu@lab1:~$ sudo ip netns add ns-internet
+ubuntu@lab1:~$ sudo ip netns add ns-isp-1
+ubuntu@lab1:~$ sudo ip netns add ns-isp-2
+ubuntu@lab1:~$ sudo ip netns add ns-router
+ubuntu@lab1:~$ sudo ip netns add ns-pc-1
+ubuntu@lab1:~$ sudo ip netns add ns-pc-2
+ubuntu@lab1:~$ sudo ip netns add ns-pc-3
+ubuntu@lab1:~$ ip netns list
+ns-pc-3
+ns-pc-2
+ns-pc-1
+ns-router
+ns-isp-2
+ns-isp-1
+ns-internet
+ubuntu@lab1:~$ 
+```
+
+
