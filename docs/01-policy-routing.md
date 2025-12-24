@@ -367,7 +367,7 @@ ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link show type veth
     link/ether c2:71:c4:78:0d:f0 brd ff:ff:ff:ff:ff:ff link-netns ns-isp-2
 ```
 ---
-### Step 04 - Assign IP addresses
+### Step 05 - Assign IP addresses
 Command:
 ```
 sudo ip netns exec ns-pc-1 ip -4 -br address
