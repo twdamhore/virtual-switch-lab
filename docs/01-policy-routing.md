@@ -152,5 +152,48 @@ ns-isp-1
 ns-internet
 ubuntu@lab1:~$ 
 ```
-
-
+### Step 04 - Create the required links
+Create link of type `bridge` in the `ns-router` namespace:
+```
+sudo ip netns exec ns-router ip link show type bridge
+sudo ip netns exec ns-router ip link add br-lan type bridge
+sudo ip netns exec ns-router ip link show type bridge
+```
+Sample output:
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type bridge
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link add br-lan type bridge
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type bridge
+2: br-lan: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether e6:ea:f2:15:cb:52 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ 
+```
+---
+Create 3 links of type `veth` for the connections between `br-lan` and `ns-pc-1`/`ns-pc-2`/`ns-pc-3`.
+```
+ip link show type veth
+sudo ip link add veth-1a type veth peer name veth-1b
+sudo ip link add veth-2a type veth peer name veth-2b
+sudo ip link add veth-3a type veth peer name veth-2b
+ip link show type veth
+```
+Sample output:
+```
+ubuntu@lab1:~$ sudo ip link show type veth
+ubuntu@lab1:~$ sudo ip link add veth-1a type veth peer name veth-1b
+ubuntu@lab1:~$ sudo ip link add veth-2a type veth peer name veth-2b
+ubuntu@lab1:~$ sudo ip link add veth-3a type veth peer name veth-3b
+ubuntu@lab1:~$ ip link show type veth
+3: veth-1b@veth-1a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 9a:f9:67:df:b5:92 brd ff:ff:ff:ff:ff:ff
+4: veth-1a@veth-1b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ee:39:c3:ca:df:44 brd ff:ff:ff:ff:ff:ff
+5: veth-2b@veth-2a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 12:cf:fc:91:c1:62 brd ff:ff:ff:ff:ff:ff
+6: veth-2a@veth-2b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether b2:58:74:ec:aa:3d brd ff:ff:ff:ff:ff:ff
+7: veth-3b@veth-3a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 2e:21:f5:5e:d2:89 brd ff:ff:ff:ff:ff:ff
+8: veth-3a@veth-3b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ca:ce:4a:fb:26:44 brd ff:ff:ff:ff:ff:ff
+```
