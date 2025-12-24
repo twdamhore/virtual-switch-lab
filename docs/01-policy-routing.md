@@ -27,23 +27,25 @@ The PC at home will ping internet again to show that policy routing has been imp
 ## Requirements
 - [Multipass](https://canonical.com/multipass) installation.
 - The vm will be created with default configuration of 1 core and 1 GB of RAM and 4 GB of disk space.
+- 
 
 ## Layout
 ### Diagram
 ```mermaid
 graph TB
-    Internet@{ label: "Internet", shape: cloud }
-    ISP_1["ns-isp-1"]
-    ISP_2["ns-isp-2"]
-    subgraph ROUTER
-        ROUTER_PORT_1["router-port-1"]
-        ROUTER_PORT_2["router-port-2"]
-        ROUTER_PORT_3["router-port-3"]
+    Internet@{ label: "Internet<br>8.8.8.8", shape: cloud }
+    ISP_1["ns-isp-1<br>10.0.1.1/30"]
+    ISP_2["ns-isp-2<br>10.0.2.1/30"]
+    subgraph "ns-router"
+        ROUTER_PORT_1["router-port-1<br>10.0.1.2/30"]
+        ROUTER_PORT_2["router-port-2<br>192.168.100.1/24"]
+        ROUTER_PORT_3["router-port-3<br>10.0.2.2/30"]
     end
-    SWITCH
-    PC_1["pc-1"]
-    PC_2["pc-2"]
-    PC_3["pc-3"]
+    SWITCH["br-lan<br>unmanaged switch<br>no IP address"]
+
+    PC_1["ns-pc-1<br>192.168.100.101/24"]
+    PC_2["ns-pc-2<br>192.168.100.102/24"]
+    PC_3["ns-pc-3<br>192.168.100.103/24"]
     
     Internet <--> ISP_1
     Internet <--> ISP_2
