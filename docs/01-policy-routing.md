@@ -257,13 +257,15 @@ sudo ip link set veth-1b netns ns-router
 sudo ip link set veth-2b netns ns-router
 sudo ip link set veth-3b netns ns-router
 sudo ip link set veth-4a netns ns-router
+sudo ip link set veth-4b netns ns-router
 sudo ip link set veth-5a netns ns-router
-sudo ip link set veth-4b netns ns-isp-1
-sudo ip link set veth-5b netns ns-isp-2
-sudo ip link set veth-6a netns ns-isp-1
-sudo ip link set veth-7a netns ns-isp-2
-sudo ip link set veth-6b netns ns-internet
+sudo ip link set veth-6a netns ns-router
+sudo ip link set veth-5b netns ns-isp-1
+sudo ip link set veth-6b netns ns-isp-2
+sudo ip link set veth-7a netns ns-isp-1
+sudo ip link set veth-8a netns ns-isp-2
 sudo ip link set veth-7b netns ns-internet
+sudo ip link set veth-8b netns ns-internet
 
 ip link show type veth
 sudo ip netns exec ns-router ip link show type veth
