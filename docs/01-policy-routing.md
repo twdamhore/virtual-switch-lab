@@ -197,3 +197,68 @@ ubuntu@lab1:~$ ip link show type veth
 8: veth-3a@veth-3b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
     link/ether ca:ce:4a:fb:26:44 brd ff:ff:ff:ff:ff:ff
 ```
+---
+Assign the link to the correct namespaces:
+```
+ip link show type veth
+sudo ip netns exec ns-router ip link show type veth
+sudo ip netns exec ns-pc-1 ip link show type veth
+sudo ip netns exec ns-pc-2 ip link show type veth
+sudo ip netns exec ns-pc-2 ip link show type veth
+sudo ip link set veth-1a netns ns-pc-1
+sudo ip link set veth-2a netns ns-pc-2
+sudo ip link set veth-3a netns ns-pc-3
+sudo ip link set veth-1b netns ns-router
+sudo ip link set veth-2b netns ns-router
+sudo ip link set veth-3b netns ns-router
+ip link show type veth
+sudo ip netns exec ns-router ip link show type veth
+sudo ip netns exec ns-pc-1 ip link show type veth
+sudo ip netns exec ns-pc-2 ip link show type veth
+sudo ip netns exec ns-pc-2 ip link show type veth
+```
+Sample output:
+```
+ubuntu@lab1:~$ ip link show type veth
+3: veth-1b@veth-1a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 9a:f9:67:df:b5:92 brd ff:ff:ff:ff:ff:ff
+4: veth-1a@veth-1b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ee:39:c3:ca:df:44 brd ff:ff:ff:ff:ff:ff
+5: veth-2b@veth-2a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 12:cf:fc:91:c1:62 brd ff:ff:ff:ff:ff:ff
+6: veth-2a@veth-2b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether b2:58:74:ec:aa:3d brd ff:ff:ff:ff:ff:ff
+7: veth-3b@veth-3a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 2e:21:f5:5e:d2:89 brd ff:ff:ff:ff:ff:ff
+8: veth-3a@veth-3b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ca:ce:4a:fb:26:44 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ip link show type veth
+ubuntu@lab1:~$ sudo ip link set veth-1a netns ns-pc-1
+ubuntu@lab1:~$ sudo ip link set veth-2a netns ns-pc-2
+ubuntu@lab1:~$ sudo ip link set veth-3a netns ns-pc-3
+ubuntu@lab1:~$ sudo ip link set veth-1b netns ns-router
+ubuntu@lab1:~$ sudo ip link set veth-2b netns ns-router
+ubuntu@lab1:~$ sudo ip link set veth-3b netns ns-router
+ubuntu@lab1:~$ ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type veth
+3: veth-1b@if4: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 9a:f9:67:df:b5:92 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
+5: veth-2b@if6: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 12:cf:fc:91:c1:62 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-2
+7: veth-3b@if8: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 2e:21:f5:5e:d2:89 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-3
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link show type veth
+4: veth-1a@if3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ee:39:c3:ca:df:44 brd ff:ff:ff:ff:ff:ff link-netns ns-router
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip link show type veth
+6: veth-2a@if5: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether b2:58:74:ec:aa:3d brd ff:ff:ff:ff:ff:ff link-netns ns-router
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ip link show type veth
+8: veth-3a@if7: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ca:ce:4a:fb:26:44 brd ff:ff:ff:ff:ff:ff link-netns ns-router
+ubuntu@lab1:~$ 
+```
+---
