@@ -13,7 +13,7 @@ Policy Routing
   - [Step 02 - Access the vm](#step-02---access-the-vm)
   - [Step 03 - Create the required namespaces](#step-03---create-the-required-namespaces)
   - [Step 04 - Create the required links](#step-04---create-the-required-links)
-  - 
+  - [Step 05 - Assign IP addresses](#step-05---assign-ip-addresses)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
