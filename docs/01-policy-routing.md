@@ -10,10 +10,8 @@ Policy Routing
 - [Hardware](#hardware-and-software)
 - [Implementation](#implementation)
   - [Step 01 - Create the virtual machine](#step-01---create-the-virtual-machine)
-  - [Step 02 - Create the required namespaces](#step-02---create-the-required-namespaces)
-  - [Step 03 - Assign an IP address to ns-pc-1](#step-03---assign-an-ip-address-to-ns-pc-1)
-  - [Step 04 - Assign an IP address to ns-router](#step-04---assign-an-ip-address-to-ns-router)
-  - [Step 05 - Assign an IP address to ns-isp-1](#step-05---assign-an-ip-address-to-ns-isp-1)
+  - [Step 02 - Access the vm](#step-02---access-the-vm)
+  - [Step 03 - Create the required namespaces](#step-03---create-the-required-namespaces)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
