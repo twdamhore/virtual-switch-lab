@@ -540,7 +540,7 @@ sudo ip netns exec ns-pc-3 ping -c 1 10.0.1.2
 sudo ip netns exec ns-pc-3 ping -c 1 10.0.2.2
 
 sudo ip netns exec ns-pc-1 ip route add 0.0.0.0/0 via 192.168.100.1
-sudo ip netns exec ns-pc-1 ip route add 0.0.0.0/0 via 192.168.100.1
+sudo ip netns exec ns-pc-2 ip route add 0.0.0.0/0 via 192.168.100.1
 sudo ip netns exec ns-pc-3 ip route add 0.0.0.0/0 via 192.168.100.1
 
 sudo ip netns exec ns-pc-1 ping -c 1 10.0.1.2
@@ -609,4 +609,9 @@ PING 10.0.2.2 (10.0.2.2) 56(84) bytes of data.
 --- 10.0.2.2 ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 0.071/0.071/0.071/0.000 ms
+```
+### Step 07 - Configure NAT
+Command:
+```
+
 ```
