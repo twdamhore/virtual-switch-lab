@@ -37,11 +37,13 @@ graph TB
     ISP_1["ns-isp-1<br>10.0.1.1/30"]
     ISP_2["ns-isp-2<br>10.0.2.1/30"]
     subgraph "ns-router"
-        ROUTER_PORT_1["router-port-1<br>10.0.1.2/30"]
-        ROUTER_PORT_2["router-port-2<br>192.168.100.1/24"]
-        ROUTER_PORT_3["router-port-3<br>10.0.2.2/30"]
+        subgraph "router"
+            ROUTER_PORT_1["router-port-1<br>10.0.1.2/30"]
+            ROUTER_PORT_2["router-port-2<br>192.168.100.1/24"]
+            ROUTER_PORT_3["router-port-3<br>10.0.2.2/30"]
+        end
+        SWITCH["br-lan<br>unmanaged switch<br>no IP address"]        
     end
-    SWITCH["br-lan<br>unmanaged switch<br>no IP address"]
 
     PC_1["ns-pc-1<br>192.168.100.101/24"]
     PC_2["ns-pc-2<br>192.168.100.102/24"]
@@ -55,7 +57,6 @@ graph TB
     SWITCH <--> PC_1
     SWITCH <--> PC_2
     SWITCH <--> PC_3
-    
 ```
 ### Network Namespace
 - ns-isp-1 and ns-isp-2 - The namespace `ns-isp-1` will be the default gateway for PC-1, PC-2 and PC-3. We will then introduce policy routing where PC-1 will be explicitly configured to use `ns-isp-1`, PC-2 will be explicitly configured to use `ns-isp-2` and PC-3 will use `ns-isp-1` implicitly as PC-3 was not explcitly configure with any policy routing and will use the default route.
