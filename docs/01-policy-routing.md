@@ -528,3 +528,84 @@ PING 192.168.100.1 (192.168.100.1) 56(84) bytes of data.
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 0.272/0.272/0.272/0.000 ms
 ```
+---
+Configure the default gateway:
+```
+sudo ip netns exec ns-pc-1 ping -c 1 10.0.1.2
+sudo ip netns exec ns-pc-1 ping -c 1 10.0.2.2
+sudo ip netns exec ns-pc-2 ping -c 1 10.0.1.2
+sudo ip netns exec ns-pc-2 ping -c 1 10.0.2.2
+sudo ip netns exec ns-pc-3 ping -c 1 10.0.1.2
+sudo ip netns exec ns-pc-3 ping -c 1 10.0.2.2
+
+sudo ip netns exec ns-pc-1 ip route add 0.0.0.0/0 via 192.168.100.1
+sudo ip netns exec ns-pc-1 ip route add 0.0.0.0/0 via 192.168.100.1
+sudo ip netns exec ns-pc-3 ip route add 0.0.0.0/0 via 192.168.100.1
+
+sudo ip netns exec ns-pc-1 ping -c 1 10.0.1.2
+sudo ip netns exec ns-pc-1 ping -c 1 10.0.2.2
+sudo ip netns exec ns-pc-2 ping -c 1 10.0.1.2
+sudo ip netns exec ns-pc-2 ping -c 1 10.0.2.2
+sudo ip netns exec ns-pc-3 ping -c 1 10.0.1.2
+sudo ip netns exec ns-pc-3 ping -c 1 10.0.2.2
+```
+Sample output:
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 10.0.1.2
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 10.0.2.2
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 10.0.1.2
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 10.0.2.2
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 10.0.1.2
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 10.0.2.2
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip route add 0.0.0.0/0 via 192.168.100.1
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip route add 0.0.0.0/0 via 192.168.100.1
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ip route add 0.0.0.0/0 via 192.168.100.1
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 10.0.1.2
+PING 10.0.1.2 (10.0.1.2) 56(84) bytes of data.
+64 bytes from 10.0.1.2: icmp_seq=1 ttl=64 time=0.065 ms
+
+--- 10.0.1.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.065/0.065/0.065/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 10.0.2.2
+PING 10.0.2.2 (10.0.2.2) 56(84) bytes of data.
+64 bytes from 10.0.2.2: icmp_seq=1 ttl=64 time=0.171 ms
+
+--- 10.0.2.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.171/0.171/0.171/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 10.0.1.2
+PING 10.0.1.2 (10.0.1.2) 56(84) bytes of data.
+64 bytes from 10.0.1.2: icmp_seq=1 ttl=64 time=0.165 ms
+
+--- 10.0.1.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.165/0.165/0.165/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 10.0.2.2
+PING 10.0.2.2 (10.0.2.2) 56(84) bytes of data.
+64 bytes from 10.0.2.2: icmp_seq=1 ttl=64 time=0.087 ms
+
+--- 10.0.2.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.087/0.087/0.087/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 10.0.1.2
+PING 10.0.1.2 (10.0.1.2) 56(84) bytes of data.
+64 bytes from 10.0.1.2: icmp_seq=1 ttl=64 time=0.059 ms
+
+--- 10.0.1.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.059/0.059/0.059/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 10.0.2.2
+PING 10.0.2.2 (10.0.2.2) 56(84) bytes of data.
+64 bytes from 10.0.2.2: icmp_seq=1 ttl=64 time=0.071 ms
+
+--- 10.0.2.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.071/0.071/0.071/0.000 ms
+```
