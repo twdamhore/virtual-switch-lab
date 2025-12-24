@@ -188,6 +188,7 @@ ubuntu@lab1:~$
 ```
 ---
 - Create 3 links of type `veth` for the connections between `br-lan` and `ns-pc-1`/`ns-pc-2`/`ns-pc-3`.
+- Create 1 link of type `veth` for the connections between `br-lan` and `ns-router`.
 - Create 2 links of type `veth` for the connections between `ns-router` and `ns-isp-1`/`ns-isp-2`.
 - Create 2 links of type `veth` for the connections between `ns-internet` and `ns-isp-1`/`ns-isp-2`.
 ```
