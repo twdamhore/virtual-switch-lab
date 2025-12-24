@@ -14,6 +14,7 @@ Policy Routing
   - [Step 03 - Create the required namespaces](#step-03---create-the-required-namespaces)
   - [Step 04 - Create the required links](#step-04---create-the-required-links)
   - [Step 05 - Assign IP addresses](#step-05---assign-ip-addresses)
+  - [Step 06 - Configure PC Gateway](#x)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -32,7 +33,7 @@ The PC at home will ping internet again to show that policy routing has been imp
 ### Diagram
 ```mermaid
 graph TB
-    Internet@{ label: "Internet<br>ns-internet<br>8.8.8.8", shape: cloud }
+    Internet@{ label: "Internet<br>ns-internet<br>8.8.8.8/32", shape: cloud }
     ISP_1["ns-isp-1<br>10.0.1.1/30"]
     ISP_2["ns-isp-2<br>10.0.2.1/30"]
     subgraph "ns-router"
@@ -383,7 +384,6 @@ ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link show type veth
 17: veth-8b@if18: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
     link/ether 5a:35:ee:5b:f5:07 brd ff:ff:ff:ff:ff:ff link-netns ns-isp-2
 ```
----
 ### Step 05 - Assign IP addresses
 Command:
 ```
@@ -448,4 +448,83 @@ veth-6b@if14     DOWN           10.0.2.1/30
 ubuntu@lab1:~$ sudo ip netns exec ns-internet ip -4 -br address
 br-internet      DOWN           8.8.8.8/32 
 ```
+### Step 06 - Configure PC Gateway
+Command:
+```
+sudo ip netns exec ns-pc-1 ping -c 1 192.168.100.1
+sudo ip netns exec ns-pc-2 ping -c 1 192.168.100.1
+sudo ip netns exec ns-pc-3 ping -c 1 192.168.100.1
 
+sudo ip netns exec ns-router ip link set veth-4a master br-lan
+sudo ip netns exec ns-router ip link set lo up
+sudo ip netns exec ns-router ip link set br-lan up
+sudo ip netns exec ns-router ip link set veth-4a up
+sudo ip netns exec ns-router ip link set veth-4b up
+
+sudo ip netns exec ns-pc-1 ip link set veth-1a up
+sudo ip netns exec ns-router ip link set veth-1b master br-lan
+sudo ip netns exec ns-router ip link set veth-1b up
+sudo ip netns exec ns-pc-1 ip link set lo up
+sudo ip netns exec ns-pc-1 ping -c 1 192.168.100.1
+
+sudo ip netns exec ns-pc-2 ip link set veth-2a up
+sudo ip netns exec ns-router ip link set veth-2b master br-lan
+sudo ip netns exec ns-router ip link set veth-2b up
+sudo ip netns exec ns-pc-2 ip link set lo up
+sudo ip netns exec ns-pc-2 ping -c 1 192.168.100.1
+
+sudo ip netns exec ns-pc-3 ip link set veth-3a up
+sudo ip netns exec ns-router ip link set veth-3b master br-lan
+sudo ip netns exec ns-router ip link set veth-3b up
+sudo ip netns exec ns-pc-3 ip link set lo up
+sudo ip netns exec ns-pc-3 ping -c 1 192.168.100.1
+```
+Sample output:
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 192.168.100.1
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 192.168.100.1
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 192.168.100.1
+ping: connect: Network is unreachable
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-4a master br-lan
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set lo up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set br-lan up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-4a up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-4b up
+ubuntu@lab1:~$ 
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link set veth-1a up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-1b master br-lan
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-1b up
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link set lo up
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 192.168.100.1
+PING 192.168.100.1 (192.168.100.1) 56(84) bytes of data.
+64 bytes from 192.168.100.1: icmp_seq=1 ttl=64 time=0.421 ms
+
+--- 192.168.100.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.421/0.421/0.421/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip link set veth-2a up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-2b master br-lan
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-2b up
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip link set lo up
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 192.168.100.1
+PING 192.168.100.1 (192.168.100.1) 56(84) bytes of data.
+64 bytes from 192.168.100.1: icmp_seq=1 ttl=64 time=0.215 ms
+
+--- 192.168.100.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.215/0.215/0.215/0.000 ms
+ubuntu@lab1:~$ 
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ip link set veth-3a up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-3b master br-lan
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-3b up
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ip link set lo up
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 192.168.100.1
+PING 192.168.100.1 (192.168.100.1) 56(84) bytes of data.
+64 bytes from 192.168.100.1: icmp_seq=1 ttl=64 time=0.272 ms
+
+--- 192.168.100.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.272/0.272/0.272/0.000 ms
+```
