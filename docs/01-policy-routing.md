@@ -14,7 +14,7 @@ Policy Routing
   - [Step 03 - Create the required namespaces](#step-03---create-the-required-namespaces)
   - [Step 04 - Create the required links](#step-04---create-the-required-links)
   - [Step 05 - Assign IP addresses](#step-05---assign-ip-addresses)
-  - [Step 06 - Configure PC Gateway](#x)
+  - [Step 06 - Configure PC Gateway](#step-06---configure-pc-gateway)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
