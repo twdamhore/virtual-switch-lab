@@ -50,8 +50,8 @@ graph TB
     
     Internet <--> ISP_1
     Internet <--> ISP_2
-    ROUTER_PORT_1 --> ISP_1
-    ROUTER_PORT_3 --> ISP_2
+    ISP_1 <--> ROUTER_PORT_1
+    ISP_2 <--> ROUTER_PORT_3
     ROUTER_PORT_2 <--> SWITCH
     SWITCH <--> PC_1
     SWITCH <--> PC_2
