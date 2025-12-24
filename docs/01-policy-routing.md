@@ -153,11 +153,27 @@ ns-internet
 ubuntu@lab1:~$ 
 ```
 ### Step 04 - Create the required links
-Create link of type `bridge` in the `ns-router` namespace:
+Create link of type `bridge` named `br-lan` in the `ns-router` namespace:
 ```
 sudo ip netns exec ns-router ip link show type bridge
 sudo ip netns exec ns-router ip link add br-lan type bridge
 sudo ip netns exec ns-router ip link show type bridge
+```
+Sample output:
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type bridge
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link add br-lan type bridge
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type bridge
+2: br-lan: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether e6:ea:f2:15:cb:52 brd ff:ff:ff:ff:ff:ff
+ubuntu@lab1:~$ 
+```
+---
+Create link of type `bridge` named `br-internet` in the `ns-internet` namespace:
+```
+sudo ip netns exec ns-internet ip link show type bridge
+sudo ip netns exec ns-internet ip link add br-internet type bridge
+sudo ip netns exec ns-internet ip link show type bridge
 ```
 Sample output:
 ```
