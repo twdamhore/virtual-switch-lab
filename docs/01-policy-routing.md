@@ -33,10 +33,11 @@ The PC at home will ping internet again to show that policy routing has been imp
 ### Diagram
 ```mermaid
 graph TB
-    Internet@{ label: "Internet<br>ns-internet<br>8.8.8.8/32", shape: cloud }
+    Internet@{ label: "Internet<br>ns-internet<br>br-wan<br>8.8.8.8/32", shape: cloud }
     ISP_1["ns-isp-1<br>10.0.1.1/30"]
     ISP_2["ns-isp-2<br>10.0.2.1/30"]
     subgraph "ns-router"
+        direction LR
         subgraph "router"
             ROUTER_PORT_1["router-port-1<br>10.0.1.2/30"]
             ROUTER_PORT_2["router-port-2<br>192.168.100.1/24"]
@@ -171,18 +172,18 @@ ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type bridge
     link/ether 1e:76:75:b4:3e:b5 brd ff:ff:ff:ff:ff:ff
 ```
 ---
-Create link of type `bridge` named `br-internet` in the `ns-internet` namespace:
+Create link of type `bridge` named `br-wan` in the `ns-internet` namespace:
 ```
 sudo ip netns exec ns-internet ip link show type bridge
-sudo ip netns exec ns-internet ip link add br-internet type bridge
+sudo ip netns exec ns-internet ip link add br-wan type bridge
 sudo ip netns exec ns-internet ip link show type bridge
 ```
 Sample output:
 ```
 ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link show type bridge
-ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link add br-internet type bridge
+ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link add br-wan type bridge
 ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link show type bridge
-2: br-internet: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+2: br-wan: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
     link/ether 52:cc:6e:d6:d9:52 brd ff:ff:ff:ff:ff:ff
 ```
 ---
@@ -403,7 +404,7 @@ sudo ip netns exec ns-router ip add add 10.0.1.2/30 dev veth-5a
 sudo ip netns exec ns-router ip add add 10.0.2.2/30 dev veth-6a
 sudo ip netns exec ns-isp-1 ip add add 10.0.1.1/30 dev veth-5b
 sudo ip netns exec ns-isp-2 ip add add 10.0.2.1/30 dev veth-6b
-sudo ip netns exec ns-internet ip add add 8.8.8.8/32 dev br-internet
+sudo ip netns exec ns-internet ip add add 8.8.8.8/32 dev br-wan
 
 sudo ip netns exec ns-pc-1 ip -4 -br address
 sudo ip netns exec ns-pc-2 ip -4 -br address
@@ -430,7 +431,7 @@ ubuntu@lab1:~$ sudo ip netns exec ns-router ip add add 10.0.1.2/30 dev veth-5a
 ubuntu@lab1:~$ sudo ip netns exec ns-router ip add add 10.0.2.2/30 dev veth-6a
 ubuntu@lab1:~$ sudo ip netns exec ns-isp-1 ip add add 10.0.1.1/30 dev veth-5b
 ubuntu@lab1:~$ sudo ip netns exec ns-isp-2 ip add add 10.0.2.1/30 dev veth-6b
-ubuntu@lab1:~$ sudo ip netns exec ns-internet ip add add 8.8.8.8/32 dev br-internet
+ubuntu@lab1:~$ sudo ip netns exec ns-internet ip add add 8.8.8.8/32 dev br-wan
 ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip -4 -br address
 veth-1a@if3      DOWN           192.168.100.101/24 
 ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip -4 -br address
@@ -446,7 +447,7 @@ veth-5b@if12     DOWN           10.0.1.1/30
 ubuntu@lab1:~$ sudo ip netns exec ns-isp-2 ip -4 -br address
 veth-6b@if14     DOWN           10.0.2.1/30 
 ubuntu@lab1:~$ sudo ip netns exec ns-internet ip -4 -br address
-br-internet      DOWN           8.8.8.8/32 
+br-wan           DOWN           8.8.8.8/32 
 ```
 ### Step 06 - Configure PC Gateway
 Command:
