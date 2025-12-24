@@ -169,12 +169,18 @@ ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type bridge
 ubuntu@lab1:~$ 
 ```
 ---
-Create 3 links of type `veth` for the connections between `br-lan` and `ns-pc-1`/`ns-pc-2`/`ns-pc-3`.
+- Create 3 links of type `veth` for the connections between `br-lan` and `ns-pc-1`/`ns-pc-2`/`ns-pc-3`.
+- Create 2 links of type `veth` for the connections between `ns-router` and `ns-isp-1`/`ns-isp-2`.
+- Create 2 links of type `veth` for the connections between `ns-internet` and `ns-isp-1`/`ns-isp-2`.
 ```
 ip link show type veth
 sudo ip link add veth-1a type veth peer name veth-1b
 sudo ip link add veth-2a type veth peer name veth-2b
-sudo ip link add veth-3a type veth peer name veth-2b
+sudo ip link add veth-3a type veth peer name veth-3b
+sudo ip link add veth-4a type veth peer name veth-4b
+sudo ip link add veth-5a type veth peer name veth-5b
+sudo ip link add veth-6a type veth peer name veth-6b
+sudo ip link add veth-7a type veth peer name veth-7b
 ip link show type veth
 ```
 Sample output:
@@ -185,17 +191,33 @@ ubuntu@lab1:~$ sudo ip link add veth-2a type veth peer name veth-2b
 ubuntu@lab1:~$ sudo ip link add veth-3a type veth peer name veth-3b
 ubuntu@lab1:~$ ip link show type veth
 3: veth-1b@veth-1a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 9a:f9:67:df:b5:92 brd ff:ff:ff:ff:ff:ff
+    link/ether 12:66:18:78:7a:ed brd ff:ff:ff:ff:ff:ff
 4: veth-1a@veth-1b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether ee:39:c3:ca:df:44 brd ff:ff:ff:ff:ff:ff
+    link/ether be:5a:61:4e:d4:14 brd ff:ff:ff:ff:ff:ff
 5: veth-2b@veth-2a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 12:cf:fc:91:c1:62 brd ff:ff:ff:ff:ff:ff
+    link/ether 5a:59:ea:a2:36:5f brd ff:ff:ff:ff:ff:ff
 6: veth-2a@veth-2b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether b2:58:74:ec:aa:3d brd ff:ff:ff:ff:ff:ff
+    link/ether be:c4:68:67:f0:5d brd ff:ff:ff:ff:ff:ff
 7: veth-3b@veth-3a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 2e:21:f5:5e:d2:89 brd ff:ff:ff:ff:ff:ff
+    link/ether 26:25:82:96:eb:ae brd ff:ff:ff:ff:ff:ff
 8: veth-3a@veth-3b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether ca:ce:4a:fb:26:44 brd ff:ff:ff:ff:ff:ff
+    link/ether 5a:64:f0:7f:ae:dd brd ff:ff:ff:ff:ff:ff
+9: veth-4b@veth-4a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether e6:c3:df:98:f6:e6 brd ff:ff:ff:ff:ff:ff
+10: veth-4a@veth-4b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 6a:fc:f7:e4:a2:4c brd ff:ff:ff:ff:ff:ff
+11: veth-5b@veth-5a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 8e:1f:dd:b0:0b:94 brd ff:ff:ff:ff:ff:ff
+12: veth-5a@veth-5b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 76:30:41:37:9b:f0 brd ff:ff:ff:ff:ff:ff
+13: veth-6b@veth-6a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether f2:af:16:59:0b:14 brd ff:ff:ff:ff:ff:ff
+14: veth-6a@veth-6b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ce:7d:00:84:04:59 brd ff:ff:ff:ff:ff:ff
+15: veth-7b@veth-7a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 12:74:b5:fe:33:81 brd ff:ff:ff:ff:ff:ff
+16: veth-7a@veth-7b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether be:f2:8c:c1:38:c9 brd ff:ff:ff:ff:ff:ff
 ```
 ---
 Assign the link to the correct namespaces:
@@ -204,61 +226,126 @@ ip link show type veth
 sudo ip netns exec ns-router ip link show type veth
 sudo ip netns exec ns-pc-1 ip link show type veth
 sudo ip netns exec ns-pc-2 ip link show type veth
-sudo ip netns exec ns-pc-2 ip link show type veth
+sudo ip netns exec ns-pc-3 ip link show type veth
+sudo ip netns exec ns-isp-1 ip link show type veth
+sudo ip netns exec ns-isp-2 ip link show type veth
+sudo ip netns exec ns-internet ip link show type veth
+
 sudo ip link set veth-1a netns ns-pc-1
 sudo ip link set veth-2a netns ns-pc-2
 sudo ip link set veth-3a netns ns-pc-3
 sudo ip link set veth-1b netns ns-router
 sudo ip link set veth-2b netns ns-router
 sudo ip link set veth-3b netns ns-router
+sudo ip link set veth-4a netns ns-router
+sudo ip link set veth-5a netns ns-router
+sudo ip link set veth-4b netns ns-isp-1
+sudo ip link set veth-5b netns ns-isp-2
+sudo ip link set veth-6a netns ns-isp-1
+sudo ip link set veth-7a netns ns-isp-2
+sudo ip link set veth-6b netns ns-internet
+sudo ip link set veth-7b netns ns-internet
+
 ip link show type veth
 sudo ip netns exec ns-router ip link show type veth
 sudo ip netns exec ns-pc-1 ip link show type veth
 sudo ip netns exec ns-pc-2 ip link show type veth
-sudo ip netns exec ns-pc-2 ip link show type veth
+sudo ip netns exec ns-pc-3 ip link show type veth
+sudo ip netns exec ns-isp-1 ip link show type veth
+sudo ip netns exec ns-isp-2 ip link show type veth
+sudo ip netns exec ns-internet ip link show type veth
 ```
 Sample output:
 ```
 ubuntu@lab1:~$ ip link show type veth
 3: veth-1b@veth-1a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 9a:f9:67:df:b5:92 brd ff:ff:ff:ff:ff:ff
+    link/ether 12:66:18:78:7a:ed brd ff:ff:ff:ff:ff:ff
 4: veth-1a@veth-1b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether ee:39:c3:ca:df:44 brd ff:ff:ff:ff:ff:ff
+    link/ether be:5a:61:4e:d4:14 brd ff:ff:ff:ff:ff:ff
 5: veth-2b@veth-2a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 12:cf:fc:91:c1:62 brd ff:ff:ff:ff:ff:ff
+    link/ether 5a:59:ea:a2:36:5f brd ff:ff:ff:ff:ff:ff
 6: veth-2a@veth-2b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether b2:58:74:ec:aa:3d brd ff:ff:ff:ff:ff:ff
+    link/ether be:c4:68:67:f0:5d brd ff:ff:ff:ff:ff:ff
 7: veth-3b@veth-3a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 2e:21:f5:5e:d2:89 brd ff:ff:ff:ff:ff:ff
+    link/ether 26:25:82:96:eb:ae brd ff:ff:ff:ff:ff:ff
 8: veth-3a@veth-3b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether ca:ce:4a:fb:26:44 brd ff:ff:ff:ff:ff:ff
+    link/ether 5a:64:f0:7f:ae:dd brd ff:ff:ff:ff:ff:ff
+9: veth-4b@veth-4a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether e6:c3:df:98:f6:e6 brd ff:ff:ff:ff:ff:ff
+10: veth-4a@veth-4b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 6a:fc:f7:e4:a2:4c brd ff:ff:ff:ff:ff:ff
+11: veth-5b@veth-5a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 8e:1f:dd:b0:0b:94 brd ff:ff:ff:ff:ff:ff
+12: veth-5a@veth-5b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 76:30:41:37:9b:f0 brd ff:ff:ff:ff:ff:ff
+13: veth-6b@veth-6a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 46:74:ff:57:f2:8d brd ff:ff:ff:ff:ff:ff
+14: veth-6a@veth-6b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 8e:9d:97:8c:03:5b brd ff:ff:ff:ff:ff:ff
+15: veth-7b@veth-7a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether c2:71:c4:78:0d:f0 brd ff:ff:ff:ff:ff:ff
+16: veth-7a@veth-7b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 1e:86:c8:a9:38:b7 brd ff:ff:ff:ff:ff:ff
 ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type veth
 ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link show type veth
 ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip link show type veth
 ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-1 ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-2 ip link show type veth
+ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link show type veth
 ubuntu@lab1:~$ sudo ip link set veth-1a netns ns-pc-1
 ubuntu@lab1:~$ sudo ip link set veth-2a netns ns-pc-2
 ubuntu@lab1:~$ sudo ip link set veth-3a netns ns-pc-3
 ubuntu@lab1:~$ sudo ip link set veth-1b netns ns-router
 ubuntu@lab1:~$ sudo ip link set veth-2b netns ns-router
 ubuntu@lab1:~$ sudo ip link set veth-3b netns ns-router
+ubuntu@lab1:~$ sudo ip link set veth-4a netns ns-router
+ubuntu@lab1:~$ sudo ip link set veth-5a netns ns-router
+ubuntu@lab1:~$ sudo ip link set veth-4b netns ns-isp-1
+ubuntu@lab1:~$ sudo ip link set veth-5b netns ns-isp-2
+ubuntu@lab1:~$ sudo ip link set veth-6a netns ns-isp-1
+ubuntu@lab1:~$ sudo ip link set veth-7a netns ns-isp-2
+ubuntu@lab1:~$ sudo ip link set veth-6b netns ns-internet
+ubuntu@lab1:~$ sudo ip link set veth-7b netns ns-internet
 ubuntu@lab1:~$ ip link show type veth
 ubuntu@lab1:~$ sudo ip netns exec ns-router ip link show type veth
 3: veth-1b@if4: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 9a:f9:67:df:b5:92 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
+    link/ether 12:66:18:78:7a:ed brd ff:ff:ff:ff:ff:ff link-netns ns-pc-1
 5: veth-2b@if6: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 12:cf:fc:91:c1:62 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-2
+    link/ether 5a:59:ea:a2:36:5f brd ff:ff:ff:ff:ff:ff link-netns ns-pc-2
 7: veth-3b@if8: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 2e:21:f5:5e:d2:89 brd ff:ff:ff:ff:ff:ff link-netns ns-pc-3
+    link/ether 26:25:82:96:eb:ae brd ff:ff:ff:ff:ff:ff link-netns ns-pc-3
+10: veth-4a@if9: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 6a:fc:f7:e4:a2:4c brd ff:ff:ff:ff:ff:ff link-netns ns-isp-1
+12: veth-5a@if11: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 76:30:41:37:9b:f0 brd ff:ff:ff:ff:ff:ff link-netns ns-isp-2
 ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ip link show type veth
 4: veth-1a@if3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether ee:39:c3:ca:df:44 brd ff:ff:ff:ff:ff:ff link-netns ns-router
+    link/ether be:5a:61:4e:d4:14 brd ff:ff:ff:ff:ff:ff link-netns ns-router
 ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip link show type veth
 6: veth-2a@if5: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether b2:58:74:ec:aa:3d brd ff:ff:ff:ff:ff:ff link-netns ns-router
+    link/ether be:c4:68:67:f0:5d brd ff:ff:ff:ff:ff:ff link-netns ns-router
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ip link show type veth
+6: veth-2a@if5: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether be:c4:68:67:f0:5d brd ff:ff:ff:ff:ff:ff link-netns ns-router
 ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ip link show type veth
 8: veth-3a@if7: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether ca:ce:4a:fb:26:44 brd ff:ff:ff:ff:ff:ff link-netns ns-router
-ubuntu@lab1:~$ 
+    link/ether 5a:64:f0:7f:ae:dd brd ff:ff:ff:ff:ff:ff link-netns ns-router
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-1 ip link show type veth
+9: veth-4b@if10: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether e6:c3:df:98:f6:e6 brd ff:ff:ff:ff:ff:ff link-netns ns-router
+14: veth-6a@if13: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 8e:9d:97:8c:03:5b brd ff:ff:ff:ff:ff:ff link-netns ns-internet
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-2 ip link show type veth
+11: veth-5b@if12: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 8e:1f:dd:b0:0b:94 brd ff:ff:ff:ff:ff:ff link-netns ns-router
+16: veth-7a@if15: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 1e:86:c8:a9:38:b7 brd ff:ff:ff:ff:ff:ff link-netns ns-internet
+ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link show type veth
+13: veth-6b@if14: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 46:74:ff:57:f2:8d brd ff:ff:ff:ff:ff:ff link-netns ns-isp-1
+15: veth-7b@if16: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether c2:71:c4:78:0d:f0 brd ff:ff:ff:ff:ff:ff link-netns ns-isp-2
 ```
 ---
+Assign the links in the `ns-router` namespace
