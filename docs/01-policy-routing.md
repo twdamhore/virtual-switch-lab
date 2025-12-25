@@ -15,6 +15,7 @@ Policy Routing
   - [Step 04 - Create the required links](#step-04---create-the-required-links)
   - [Step 05 - Assign IP addresses](#step-05---assign-ip-addresses)
   - [Step 06 - Configure PC Gateway](#step-06---configure-pc-gateway)
+  - [Step 07 - Configure NAT](#step-07---configure-nat)
 
 ## Overview
 The lab uses multipass to create a virtual machine.
@@ -613,5 +614,161 @@ rtt min/avg/max/mdev = 0.071/0.071/0.071/0.000 ms
 ### Step 07 - Configure NAT
 Command:
 ```
+sudo ip netns exec ns-router sysctl net.ipv4.ip_forward
+sudo ip netns exec ns-router iptables -t nat --list
+sudo ip netns exec ns-pc-1 ping -c 1 -W 1 10.0.1.1
+sudo ip netns exec ns-pc-1 ping -c 1 -W 1 10.0.2.1
+sudo ip netns exec ns-pc-2 ping -c 1 -W 1 10.0.1.1
+sudo ip netns exec ns-pc-2 ping -c 1 -W 1 10.0.2.1
+sudo ip netns exec ns-pc-3 ping -c 1 -W 1 10.0.1.1
+sudo ip netns exec ns-pc-3 ping -c 1 -W 1 10.0.2.1
+sudo ip netns exec ns-router ip -br -4 address show
 
+sudo ip netns exec ns-router ip link set veth-5a up
+sudo ip netns exec ns-router ip link set veth-6a up
+sudo ip netns exec ns-isp-1 ip link set veth-5b up
+sudo ip netns exec ns-isp-2 ip link set veth-6b up
+sudo ip netns exec ns-router sysctl -w net.ipv4.ip_forward=1
+sudo ip netns exec ns-router iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o veth-5a -j MASQUERADE
+sudo ip netns exec ns-router iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o veth-6a -j MASQUERADE
+
+sudo ip netns exec ns-router sysctl net.ipv4.ip_forward
+sudo ip netns exec ns-router iptables -t nat --list
+sudo ip netns exec ns-pc-1 ping -c 1 -W 1 10.0.1.1
+sudo ip netns exec ns-pc-1 ping -c 1 -W 1 10.0.2.1
+sudo ip netns exec ns-pc-2 ping -c 1 -W 1 10.0.1.1
+sudo ip netns exec ns-pc-2 ping -c 1 -W 1 10.0.2.1
+sudo ip netns exec ns-pc-3 ping -c 1 -W 1 10.0.1.1
+sudo ip netns exec ns-pc-3 ping -c 1 -W 1 10.0.2.1
+sudo ip netns exec ns-router ip -br -4 address show
+```
+Sample output:
+```
+ubuntu@lab1:~$ sudo ip netns exec ns-router sysctl net.ipv4.ip_forward
+net.ipv4.ip_forward = 0
+ubuntu@lab1:~$ sudo ip netns exec ns-router iptables -t nat --list
+Chain PREROUTING (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination         
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 -W 1 10.0.1.1
+PING 10.0.1.1 (10.0.1.1) 56(84) bytes of data.
+
+--- 10.0.1.1 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 -W 1 10.0.2.1
+PING 10.0.2.1 (10.0.2.1) 56(84) bytes of data.
+
+--- 10.0.2.1 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 -W 1 10.0.1.1
+PING 10.0.1.1 (10.0.1.1) 56(84) bytes of data.
+
+--- 10.0.1.1 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 -W 1 10.0.2.1
+PING 10.0.2.1 (10.0.2.1) 56(84) bytes of data.
+
+--- 10.0.2.1 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 -W 1 10.0.1.1
+PING 10.0.1.1 (10.0.1.1) 56(84) bytes of data.
+
+--- 10.0.1.1 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 -W 1 10.0.2.1
+PING 10.0.2.1 (10.0.2.1) 56(84) bytes of data.
+
+--- 10.0.2.1 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip -br -4 address show
+lo               UNKNOWN        127.0.0.1/8 
+veth-4b@veth-4a  UP             192.168.100.1/24 
+veth-5a@if187    DOWN           10.0.1.2/30 
+veth-6a@if189    DOWN           10.0.2.2/30 
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-5a up
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip link set veth-6a up
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-1 ip link set veth-5b up
+ubuntu@lab1:~$ sudo ip netns exec ns-isp-2 ip link set veth-6b up
+ubuntu@lab1:~$ sudo ip netns exec ns-router sysctl -w net.ipv4.ip_forward=1
+net.ipv4.ip_forward = 1
+ubuntu@lab1:~$ sudo ip netns exec ns-router iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o veth-5a -j MASQUERADE
+ubuntu@lab1:~$ sudo ip netns exec ns-router iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o veth-6a -j MASQUERADE
+ubuntu@lab1:~$ sudo ip netns exec ns-router sysctl net.ipv4.ip_forward
+net.ipv4.ip_forward = 1
+ubuntu@lab1:~$ sudo ip netns exec ns-router iptables -t nat --list
+Chain PREROUTING (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination         
+MASQUERADE  all  --  192.168.100.0/24     anywhere            
+MASQUERADE  all  --  192.168.100.0/24     anywhere            
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 -W 1 10.0.1.1
+PING 10.0.1.1 (10.0.1.1) 56(84) bytes of data.
+64 bytes from 10.0.1.1: icmp_seq=1 ttl=63 time=0.148 ms
+
+--- 10.0.1.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.148/0.148/0.148/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-1 ping -c 1 -W 1 10.0.2.1
+PING 10.0.2.1 (10.0.2.1) 56(84) bytes of data.
+64 bytes from 10.0.2.1: icmp_seq=1 ttl=63 time=0.232 ms
+
+--- 10.0.2.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.232/0.232/0.232/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 -W 1 10.0.1.1
+PING 10.0.1.1 (10.0.1.1) 56(84) bytes of data.
+64 bytes from 10.0.1.1: icmp_seq=1 ttl=63 time=0.167 ms
+
+--- 10.0.1.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.167/0.167/0.167/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-2 ping -c 1 -W 1 10.0.2.1
+PING 10.0.2.1 (10.0.2.1) 56(84) bytes of data.
+64 bytes from 10.0.2.1: icmp_seq=1 ttl=63 time=0.175 ms
+
+--- 10.0.2.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.175/0.175/0.175/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 -W 1 10.0.1.1
+PING 10.0.1.1 (10.0.1.1) 56(84) bytes of data.
+64 bytes from 10.0.1.1: icmp_seq=1 ttl=63 time=0.197 ms
+
+--- 10.0.1.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.197/0.197/0.197/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-pc-3 ping -c 1 -W 1 10.0.2.1
+PING 10.0.2.1 (10.0.2.1) 56(84) bytes of data.
+64 bytes from 10.0.2.1: icmp_seq=1 ttl=63 time=0.341 ms
+
+--- 10.0.2.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.341/0.341/0.341/0.000 ms
+ubuntu@lab1:~$ sudo ip netns exec ns-router ip -br -4 address show
+lo               UNKNOWN        127.0.0.1/8 
+veth-4b@veth-4a  UP             192.168.100.1/24 
+veth-5a@if187    UP             10.0.1.2/30 
+veth-6a@if189    UP             10.0.2.2/30 
+ubuntu@lab1:~$ 
 ```
