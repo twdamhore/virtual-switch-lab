@@ -770,5 +770,4 @@ lo               UNKNOWN        127.0.0.1/8
 veth-4b@veth-4a  UP             192.168.100.1/24 
 veth-5a@if187    UP             10.0.1.2/30 
 veth-6a@if189    UP             10.0.2.2/30 
-ubuntu@lab1:~$ 
 ```
