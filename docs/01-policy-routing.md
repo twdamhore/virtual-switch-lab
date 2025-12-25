@@ -192,6 +192,7 @@ ubuntu@lab1:~$ sudo ip netns exec ns-internet ip link show type bridge
 - Create 1 link of type `veth` for the connections between `br-lan` and `ns-router`.
 - Create 2 links of type `veth` for the connections between `ns-router` and `ns-isp-1`/`ns-isp-2`.
 - Create 2 links of type `veth` for the connections between `ns-internet` and `ns-isp-1`/`ns-isp-2`.
+- Create 1 link of type `veth` for the connections between `br-wan` and `ns-internet`.
 ```
 ip link show type veth
 sudo ip link add veth-1a type veth peer name veth-1b
@@ -202,6 +203,7 @@ sudo ip link add veth-5a type veth peer name veth-5b
 sudo ip link add veth-6a type veth peer name veth-6b
 sudo ip link add veth-7a type veth peer name veth-7b
 sudo ip link add veth-8a type veth peer name veth-8b
+sudo ip link add veth-9a type veth peer name veth-9b
 ip link show type veth
 ```
 Sample output:
@@ -277,6 +279,8 @@ sudo ip link set veth-7a netns ns-isp-1
 sudo ip link set veth-8a netns ns-isp-2
 sudo ip link set veth-7b netns ns-internet
 sudo ip link set veth-8b netns ns-internet
+sudo ip link set veth-9a netns ns-internet
+sudo ip link set veth-9b netns ns-internet
 
 ip link show type veth
 sudo ip netns exec ns-router ip link show type veth
