@@ -402,9 +402,13 @@ sudo ip netns exec ns-pc-2 ip add add 192.168.100.102/24 dev veth-2a
 sudo ip netns exec ns-pc-3 ip add add 192.168.100.103/24 dev veth-3a
 sudo ip netns exec ns-router ip add add 192.168.100.1/24 dev veth-4b
 sudo ip netns exec ns-router ip add add 10.0.1.2/30 dev veth-5a
+sudo ip netns exec ns-isp-1  ip add add 10.0.1.1/30 dev veth-5b
 sudo ip netns exec ns-router ip add add 10.0.2.2/30 dev veth-6a
-sudo ip netns exec ns-isp-1 ip add add 10.0.1.1/30 dev veth-5b
-sudo ip netns exec ns-isp-2 ip add add 10.0.2.1/30 dev veth-6b
+sudo ip netns exec ns-isp-2  ip add add 10.0.2.1/30 dev veth-6b
+sudo ip netns exec ns-isp-1    ip add add 3.72.184.45/30 dev veth-7a
+sudo ip netns exec ns-internet ip add add 3.72.184.46/30 dev veth-7b
+sudo ip netns exec ns-isp-2    ip add add 12.33.88.153/30 dev veth-8a
+sudo ip netns exec ns-internet ip add add 12.33.88.154/30 dev veth-8b
 sudo ip netns exec ns-internet ip add add 8.8.8.8/32 dev br-wan
 
 sudo ip netns exec ns-pc-1 ip -4 -br address
