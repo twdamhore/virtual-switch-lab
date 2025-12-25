@@ -35,8 +35,8 @@ The PC at home will ping internet again to show that policy routing has been imp
 ```mermaid
 graph TB
     Internet@{ label: "Internet<br>ns-internet<br>br-wan<br>8.8.8.8/32", shape: cloud }
-    ISP_1["ns-isp-1<br>10.0.1.1/30"]
-    ISP_2["ns-isp-2<br>10.0.2.1/30"]
+    ISP_1["ns-isp-1<br>10.0.1.2/30"]
+    ISP_2["ns-isp-2<br>10.0.2.2/30"]
     subgraph "ns-router"
         direction LR
         subgraph "router"
